@@ -118,16 +118,16 @@ void remote_control(void)
     else if (cmd == 'Q')
     {
       Serial.println(" Быстрее");
-      speed *= 1.1; //1.05
+      speed *= 1.05; //1.1
       Serial.print("Speed = "); 
-      Serial.println(speed);
+      Serial.println(speed*100);
     }
     else if (cmd == 'S')
     {
       Serial.println(" Медленнее");
-      speed /= 1.1; //1.05
+      speed /= 1.05; //1.1
       Serial.print("Speed = "); 
-      Serial.println(speed);
+      Serial.println(speed*100);
     }
   }
 }
@@ -147,6 +147,10 @@ float a_left; //ускорение левого
 float a_right; //ускорение правого
 unsigned long int dtime;
 unsigned long int time;
+float V_left = 0;
+float V_right = 0;
+float S_left = 0; 
+float S_right = 0;
 
 void error_calc(void)
 {
@@ -156,11 +160,11 @@ void error_calc(void)
   float dcnt_right = right_cnt - right_cnt0;
   right_cnt0 = right_cnt;
 
-  float S_left = 6*3.14*(dcnt_left/40); 
-  float S_right = 6*3.14*(dcnt_right/40);
+  S_left = 0.7*S_left + 0.3*(6*3.14*(dcnt_left/40)); 
+  S_right = 0.7*S_right + 0.3*(6*3.14*(dcnt_right/40));
 
-  float V_left = S_left/dtime*1000*0.99; //...*0.99
-  float V_right = S_right/dtime*1000;
+  V_left = 0.7*V_left + 0.3*(S_left/dtime*1000); //...*0.99
+  V_right = 0.7*V_right + 0.3*(S_right/dtime*1000);
 
   error_S = left_cnt - right_cnt;
 
@@ -168,7 +172,7 @@ void error_calc(void)
   d_error_V_left = error_V_left - error_V_left_new;
   error_V_left_new = error_V_left;
 
-  error_V_right = 0.7*error_V_right + 0.3*(V_right - speed);
+  error_V_right = 0.9*error_V_right + 0.1*(V_right - speed);
   d_error_V_right = error_V_right - error_V_right_new;
   error_V_right_new = error_V_right;
 
@@ -192,11 +196,15 @@ void error_calc(void)
     Serial.print (", B_max = ");
     Serial.print (B_max*100000000,8);
     Serial.print (", B_min = ");
-    Serial.print (B_min*100000000,8);*/
+    Serial.print (B_min*100000000,8);
     Serial.print (", error_V_left = ");
     Serial.print (error_V_left);
     Serial.print (", error_V_right = ");
-    Serial.println (error_V_right);
+    Serial.println (error_V_right);*/
+    Serial.print (", V_left = ");
+    Serial.print (V_left);
+    Serial.print (", V_right = ");
+    Serial.println (V_right);
   }
 
 }
@@ -204,10 +212,10 @@ void error_calc(void)
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-float KP = 700; //коэффициент пропорционального регулятора (700)
-float KI = 0.25; //коэффициент интегрального регулятора
-float KD = 0.5; //коэффициент дифференциального регулятора
-int N = 0;
+float KP = 120; //коэффициент пропорционального регулятора (700)
+float KI = 0.05; //коэффициент интегрального регулятора
+float KD = 0; //коэффициент дифференциального регулятора
+int N = 0; //счетчик прохождения цикла
 void control(void)
 {
   if (speed<0.01){
@@ -235,14 +243,26 @@ void control(void)
   analogWrite(VOLTAGE_RIGHT, round(voltage_right));
   analogWrite(VOLTAGE_LEFT, round(voltage_left));
 
-  if(N > 100){
-    Serial.print ("voltage_left = ");
-    Serial.print (voltage_left);
-    Serial.print (", voltage_right = ");
-    Serial.print (voltage_right);
+  if(N > 10){
+    //Serial.print ("voltage_left = ");
+    //Serial.print (voltage_left);
+    Serial.print (", V_left = ");
+    Serial.print (V_left*100);
+    //Serial.print (", error_V_left = ");
+    //Serial.print (error_V_left*100);
+    //Serial.print (", voltage_right = ");
+    //Serial.print (voltage_right);
+    Serial.print (", V_right = ");
+    Serial.println (V_right*100);
+    //Serial.print (", error_V_right = ");
+    //Serial.print (error_V_right*100);
 
-    Serial.print (", error_S = ");
-    Serial.println (error_S);
+    //Serial.print (", S_left = ");
+    //Serial.print (S_left);
+    //Serial.print (", S_right = ");
+    //Serial.print (S_right);
+    //Serial.print (", error_S = ");
+    //Serial.println (error_S);
     /*Serial.println (N);
     Serial.print ("A = ");
     Serial.print (A);
