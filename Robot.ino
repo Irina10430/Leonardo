@@ -244,8 +244,8 @@ void control(void)
   analogWrite(VOLTAGE_LEFT, round(voltage_left));
 
   if(N > 10){
-    Serial.print ("voltage_left = ");
-    Serial.print (voltage_left);
+    //Serial.print ("voltage_left = ");
+    //Serial.print (voltage_left);
     Serial.print (", V_left = ");
     Serial.print (V_left*100);
     //Serial.print (", error_V_left = ");
