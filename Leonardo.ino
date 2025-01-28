@@ -9,6 +9,7 @@
 SoftwareSerial mySerial(9, 8);
 
 float speed = 0; //требуемая скорость (см/с)
+unsigned int state = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////   Счетчик прерываний энкодера /////////////////////////////////////
@@ -17,6 +18,9 @@ unsigned long int left_cnt, left_cnt0 = 0;
 unsigned long int right_cnt, right_cnt0 = 0; 
 unsigned long int time_left0 = 0; 
 unsigned long int time_right0 = 0;
+
+unsigned long int left_cnt_square = 0;
+unsigned long int right_cnt_square = 0;
 
 //подсчет отверстий на энкодере левого колеса
 void left_wheel(void)
@@ -129,6 +133,22 @@ void remote_control(void)
       Serial.print("Speed = "); 
       Serial.println(speed*100);
     }
+    else if (cmd == 'W')
+    {
+      Serial.println(" Квадрат");
+      state = 1;
+      speed = 0.06;
+      right_cnt_square = right_cnt;
+      left_cnt_square = left_cnt;
+    }
+    else if (cmd == 'Z')
+    {
+      Serial.println(" Ручное управление");
+      state = 0;
+      voltage_left = 0;
+      voltage_right = 0;
+      speed = 0;
+    }
   }
 }
 
@@ -209,6 +229,27 @@ void error_calc(void)
 
 }
 ////////////////////////////////////////////////////////////////////////////
+void square(void)
+{
+  if (state==0) return;
+
+  if (state==1) // stright
+  {
+    if (left_cnt - left_cnt_square > 200)
+    {
+      state=2;
+      right_cnt += 20; //30
+    }
+  }
+  else // turn
+  {
+    state=1;
+    left_cnt_square = left_cnt;
+    right_cnt_square = right_cnt;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -285,12 +326,13 @@ void loop()
   time = micros();
   dtime = time - old_time;
 
-  if(dtime > 10000) // timer
+  if(dtime > 5000) // timer
   {
     old_time = time;
 
     remote_control();
     error_calc();
     control();
+    square();
   }
 }
