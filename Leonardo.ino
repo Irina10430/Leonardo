@@ -331,9 +331,9 @@ void loop()
   {
     old_time = time;
 
-    remote_control();
-    error_calc();
-    control();
-    square();
+    remote_control(); // Читаем команды
+    error_calc();     // считаем ошибку пути
+    control();        // ПИД-регулятор для движения
+    square();         // движение по квадрату, если включено
   }
 }
