@@ -9,6 +9,7 @@
 SoftwareSerial mySerial(9, 8);
 
 float speed = 0; //требуемая скорость (см/с)
+
 unsigned int state = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -343,9 +344,9 @@ void loop()
   {
     old_time = time;
 
-    remote_control();
-    error_calc();
-    control();
-    square();
+    remote_control(); // Читаем команды
+    error_calc();     // считаем ошибку пути
+    control();        // ПИД-регулятор для движения
+    square();         // движение по квадрату, если включено
   }
 }
