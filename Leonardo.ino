@@ -221,32 +221,45 @@ void error_calc(void)
     Serial.print (error_V_left);
     Serial.print (", error_V_right = ");
     Serial.println (error_V_right);*/
-    Serial.print (", V_left = ");
-    Serial.print (V_left);
-    Serial.print (", V_right = ");
-    Serial.println (V_right);
+ // Serial.print (", V_left = ");
+ // Serial.print (V_left);
+ // Serial.print (", V_right = ");
+ // Serial.println (V_right);
   }
 
 }
 ////////////////////////////////////////////////////////////////////////////
 void square(void)
 {
-  if (state==0) return;
-
   if (state==1) // stright
   {
-    if (left_cnt - left_cnt_square > 200)
+    if (left_cnt - left_cnt_square > 100)
     {
       state=2;
-      right_cnt += 20; //30
+      right_cnt += 30; //30
+      speed = 0.04;
+      left_cnt_square = left_cnt;
+      right_cnt_square = right_cnt;
+      Serial.println ("Rotate");
     }
   }
-  else // turn
+  else if(state==2) // turn
   {
-    state=1;
+    if ( abs(left_cnt - right_cnt) < 60)
+    {
+      state=1;
+      speed = 0.06;
+      left_cnt_square = left_cnt;
+      right_cnt_square = right_cnt;
+      Serial.println ("Forward");
+    }
+  }
+  else
+  {
     left_cnt_square = left_cnt;
     right_cnt_square = right_cnt;
   }
+// Serial.println (left_cnt - left_cnt_square);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -287,14 +300,14 @@ void control(void)
   if(N > 10){
     //Serial.print ("voltage_left = ");
     //Serial.print (voltage_left);
-    Serial.print (", V_left = ");
-    Serial.print (V_left*100);
+    //Serial.print (", V_left = ");
+    //Serial.print (V_left*100);
     //Serial.print (", error_V_left = ");
     //Serial.print (error_V_left*100);
     //Serial.print (", voltage_right = ");
     //Serial.print (voltage_right);
-    Serial.print (", V_right = ");
-    Serial.println (V_right*100);
+    //Serial.print (", V_right = ");
+    //Serial.println (V_right*100);
     //Serial.print (", error_V_right = ");
     //Serial.print (error_V_right*100);
 
