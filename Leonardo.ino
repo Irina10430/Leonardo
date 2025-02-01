@@ -5,7 +5,6 @@
 #define ROTATION_RIGHT 7 //направление вращения правого колеса
 
 #define debug 0
-//test commit
 
 SoftwareSerial mySerial(9, 8);
 
@@ -240,7 +239,6 @@ void square(void)
     if (left_cnt - left_cnt_square > 100)
     {
       state=2;
-      speed = 0;
       time_old = micros();
       Serial.println ("Stop");
     }
@@ -262,6 +260,16 @@ void square(void)
   {
     speed = 0.04;
     if ( abs(left_cnt - right_cnt) < 10) // если поворот закончен
+    {
+      state=4;
+      time_old = micros();
+      Serial.println ("Stop-2");
+    }
+  }
+  else if(state==4) // Stop
+  {
+    speed = 0;
+    if (micros()-time_old > 1000000)
     {
       state=1;
       speed = 0.06;
