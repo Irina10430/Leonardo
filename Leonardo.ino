@@ -231,21 +231,36 @@ void error_calc(void)
 ////////////////////////////////////////////////////////////////////////////
 void square(void)
 {
-  if (state==1) // stright
+  unsigned long int time_old = micros();
+
+  if (state==1) // едем прямо
   {
+    speed = 0.06; // пока едем прямо
     if (left_cnt - left_cnt_square > 100)
     {
       state=2;
-      right_cnt += 30; //30
-      speed = 0.04;
-      left_cnt_square = left_cnt;
-      right_cnt_square = right_cnt;
-      Serial.println ("Rotate");
+      speed = 0;
+      time_old = micros();
+      Serial.println ("Stop");
     }
   }
-  else if(state==2) // turn
+  else if(state==2) // пауза
   {
-    if ( abs(left_cnt - right_cnt) < 60)
+      speed = 0;
+      if (micros()-tme_old > 1000000)
+      {
+         state=3;
+         left_cnt_square = left_cnt;
+         right_cnt_square = right_cnt;
+         right_cnt += 30; //30
+         speed = 0.04;
+         Serial.println ("Rotate");
+      }     
+  }
+  else if(state==3) // turn
+  {
+    speed = 0.04;
+    if ( abs(left_cnt - right_cnt) < 10) // если поворот закончен
     {
       state=1;
       speed = 0.06;
@@ -254,7 +269,7 @@ void square(void)
       Serial.println ("Forward");
     }
   }
-  else
+  else // не квадрат
   {
     left_cnt_square = left_cnt;
     right_cnt_square = right_cnt;
