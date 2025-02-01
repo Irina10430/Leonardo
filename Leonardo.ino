@@ -247,7 +247,7 @@ void square(void)
   else if(state==2) // пауза
   {
       speed = 0;
-      if (micros()-tme_old > 1000000)
+      if (micros()-time_old > 1000000)
       {
          state=3;
          left_cnt_square = left_cnt;
