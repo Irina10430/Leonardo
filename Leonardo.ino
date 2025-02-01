@@ -5,6 +5,7 @@
 #define ROTATION_RIGHT 7 //направление вращения правого колеса
 
 #define debug 0
+//test commit
 
 SoftwareSerial mySerial(9, 8);
 
