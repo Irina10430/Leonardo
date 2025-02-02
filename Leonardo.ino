@@ -234,59 +234,63 @@ void square(void)
   unsigned long time_old = 0;
   unsigned long current_time;
 
-  if (state==1) // едем прямо
+  switch (state)
   {
-    speed = 0.06; // пока едем прямо
-    if (left_cnt - left_cnt_square > 100)
-    {
-      state=2;
-      time_old = millis();
-      Serial.println ("Stop");
-    }
+    case 0:       // не квадрат - готовимся к квадрату
+                  left_cnt_square = left_cnt;
+                  right_cnt_square = right_cnt;
+                  break;
+    case 1:   speed = 0.06; // едем прямо
+              if (left_cnt - left_cnt_square > 100) // условие перехода на паузу - пройденный путь
+              {
+                state=2;
+                time_old = millis();
+                Serial.println ("Stop");
+              }
+              break;
+              
+    case 2:   speed = 0; // пауза, скорость 0, ждем по времени
+              current_time = millis();
+              Serial.print(time_old);
+              Serial.print(", ");
+              Serial.print(current_time);
+              Serial.print(", ");
+              Serial.println(current_time - time_old);
+              if (current_time - time_old > 1000) // условие перехода на поворот - время (1000 = 1 second)
+              {
+                 state=3;
+                 left_cnt_square = left_cnt;
+                 right_cnt_square = right_cnt;
+                 right_cnt += 30; //30
+                 speed = 0.04;
+                 Serial.println ("Rotate");
+              }     
+              break;
+              
+    case 3:   speed = 0.04; // Поворот
+              if ( abs(left_cnt - right_cnt) < 3) // если поворот закончен
+              {
+                state=4;
+                time_old = millis();
+                Serial.println ("Stop-2");
+              }
+              break;
+              
+    case 4:   speed = 0; // вторая пауза
+              current_time = millis();
+              if (current_time - time_old > 1000) // interval in milliseconds (1000 = 1 second)
+              {
+                state=1;
+                speed = 0.06;
+                left_cnt_square = left_cnt;
+                right_cnt_square = right_cnt;
+                Serial.println ("Forward");
+              }
+              break;
+              
+    default:
+              state = 0;
   }
-  else if(state==2) // пауза
-  {
-      speed = 0;
-      current_time = millis();
-      if (current_time - time_old > 1000) // interval in milliseconds (1000 = 1 second)
-      {
-         state=3;
-         left_cnt_square = left_cnt;
-         right_cnt_square = right_cnt;
-         right_cnt += 30; //30
-         speed = 0.04;
-         Serial.println ("Rotate");
-      }     
-  }
-  else if(state==3) // turn
-  {
-    speed = 0.04;
-    if ( abs(left_cnt - right_cnt) < 3) // если поворот закончен
-    {
-      state=4;
-      time_old = millis();
-      Serial.println ("Stop-2");
-    }
-  }
-  else if(state==4) // Stop
-  {
-    speed = 0;
-    current_time = millis();
-    if (current_time-time_old > 1000) // interval in milliseconds (1000 = 1 second)
-    {
-      state=1;
-      speed = 0.06;
-      left_cnt_square = left_cnt;
-      right_cnt_square = right_cnt;
-      Serial.println ("Forward");
-    }
-  }
-  else // не квадрат
-  {
-    left_cnt_square = left_cnt;
-    right_cnt_square = right_cnt;
-  }
-// Serial.println (left_cnt - left_cnt_square);
 }
 
 ////////////////////////////////////////////////////////////////////////////
