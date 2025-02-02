@@ -231,7 +231,8 @@ void error_calc(void)
 ////////////////////////////////////////////////////////////////////////////
 void square(void)
 {
-  unsigned long int time_old = micros();
+  unsigned long time_old = 0;
+  unsigned long current_time;
 
   if (state==1) // едем прямо
   {
@@ -239,14 +240,15 @@ void square(void)
     if (left_cnt - left_cnt_square > 100)
     {
       state=2;
-      time_old = micros();
+      time_old = millis();
       Serial.println ("Stop");
     }
   }
   else if(state==2) // пауза
   {
       speed = 0;
-      if (micros()-time_old > 1000000)
+      current_time = millis();
+      if (current_time - time_old > 1000) // interval in milliseconds (1000 = 1 second)
       {
          state=3;
          left_cnt_square = left_cnt;
@@ -259,17 +261,18 @@ void square(void)
   else if(state==3) // turn
   {
     speed = 0.04;
-    if ( abs(left_cnt - right_cnt) < 10) // если поворот закончен
+    if ( abs(left_cnt - right_cnt) < 3) // если поворот закончен
     {
       state=4;
-      time_old = micros();
+      time_old = millis();
       Serial.println ("Stop-2");
     }
   }
   else if(state==4) // Stop
   {
     speed = 0;
-    if (micros()-time_old > 1000000)
+    current_time = millis();
+    if (current_time-time_old > 1000) // interval in milliseconds (1000 = 1 second)
     {
       state=1;
       speed = 0.06;
