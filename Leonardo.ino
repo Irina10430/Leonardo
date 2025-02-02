@@ -240,8 +240,8 @@ void square(void)
                   left_cnt_square = left_cnt;
                   right_cnt_square = right_cnt;
                   break;
-    case 1:   speed = 0.06; // едем прямо
-              if (left_cnt - left_cnt_square > 100) // условие перехода на паузу - пройденный путь
+    case 1:   speed = 0.02; // едем прямо
+              if (left_cnt - left_cnt_square > 50) // условие перехода на паузу - пройденный путь
               {
                 state=2;
                 time_old = millis();
@@ -262,7 +262,7 @@ void square(void)
                  left_cnt_square = left_cnt;
                  right_cnt_square = right_cnt;
                  right_cnt += 30; //30
-                 speed = 0.04;
+                 speed = 0.02;
                  Serial.println ("Rotate");
               }     
               break;
@@ -281,7 +281,7 @@ void square(void)
               if (current_time - time_old > 1000) // interval in milliseconds (1000 = 1 second)
               {
                 state=1;
-                speed = 0.06;
+                speed = 0.02;
                 left_cnt_square = left_cnt;
                 right_cnt_square = right_cnt;
                 Serial.println ("Forward");
